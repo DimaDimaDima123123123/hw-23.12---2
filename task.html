@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Homework</title>
+    <style>
+        body 
+        {
+            font-family: 'Tahoma', sans-serif;
+            color: black;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        form 
+        {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"] 
+        {
+            padding: 0.5rem 1rem;
+            border: 0.1rem solid rgb(109, 109, 109);
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            width: 80%;
+            max-width: 20rem;
+        }
+
+        button 
+        {
+            cursor: pointer;
+            background-color: rgb(0, 120, 218);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+        }
+
+        button:hover 
+        {
+            background-color: rgb(0, 63, 235);
+        }
+
+        table 
+        {
+            width: 90%;
+            max-width: 40rem;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            border: 0.1rem solid ghostwhite;
+        }
+        th
+        {
+            background-color: gainsboro;
+        }
+        th, td 
+        {
+            padding: 0.75rem;
+            text-align: center;
+            border: 0.1rem solid rgb(94, 94, 94);
+        }
+        tr:nth-child(even) td
+         {
+            background-color: gainsboro;
+        }
+
+        .weather-details 
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .weather-details img 
+        {
+            width: 2rem;
+            height: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <form id="weatherForm">
+        <label for="cityNameInput">Введите город:</label>
+        <input type="text" id="cityNameInput" placeholder="Например, Одесса">
+        <button type="button" id="getWeatherBtn">Просмотреть погоду</button>
+    </form>
+
+    <table id="weatherDataTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Город</th>
+                <th>Температура (°C)</th>
+                <th>По ощущениям (°C)</th>
+                <th>Погода в целом</th>
+                <th>Влага (%)</th>
+                <th>Примерный восход</th>
+            </tr>
+        </thead>
+                    <tbody>Погода:</tbody>
+    </table>
+
+    <script>
+        const WEATHER_API_KEY = 'd77e8a80bfcc7551c3135a39d716ce92';
+
+        const form = document.querySelector("#weatherForm");
+
+        const cityInput = document.querySelector("#cityNameInput");
+
+        const weatherTable = document.querySelector("#weatherDataTable");
+
+        const weatherTableBody = weatherTable.querySelector("tbody");
+
+        const fetchWeather = () => 
+        {
+            const city = cityInput.value.trim();
+            if (!city) return;
+
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}&units=metric&lang=ru`;
+
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(data => displayWeather(data));
+        };
+
+        const displayWeather = (data) => 
+        {
+            const { name, main, weather, sys } = data;
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>${main.temp.toFixed(1)}°C</td>
+                <td>${main.feels_like.toFixed(1)}°C</td>
+                <td class="weather-details">
+                    <img src="https://openweathermap.org/img/wn/${weather[0].icon}.png" alt="${weather[0].description}">
+                    ${weather[0].description}
+                </td>
+                <td>${main.humidity}%</td>
+                <td>${new Date(sys.sunrise * 1000).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}</td>
+            `;
+
+            weatherTableBody.appendChild(row);
+
+            weatherTable.style.display = "table";
+        };
+
+        document.querySelector("#getWeatherBtn").addEventListener("click", fetchWeather);
+    </script>
+</body>
+</html>
